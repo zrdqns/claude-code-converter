@@ -52,3 +52,7 @@ claude plugin test .
 ```
 
 El módulo está en [`hooks/register.ts`](hooks/register.ts), su contrato de estado en [`types/index.d.ts`](types/index.d.ts) y los tests en [`tests/`](tests).
+
+## Licencia
+
+[MIT](LICENSE)
