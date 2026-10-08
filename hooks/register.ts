@@ -14,14 +14,14 @@ const SCRIPT = [
   "open(sys.argv[2], 'w', encoding='utf-8').write(text)",
 ].join('\n')
 
-const failures = atom({ plugin: 'conversor', key: 'failures' } as const, {})
-const tally = atom({ plugin: 'conversor', key: 'tally' } as const, {
+const failures = atom({ plugin: 'converter', key: 'failures' } as const, {})
+const tally = atom({ plugin: 'converter', key: 'tally' } as const, {
   converted: 0,
   reused: 0,
   failed: 0,
 })
-const isPaused = atom({ plugin: 'conversor', key: 'isPaused' } as const, false)
-const notice = atom({ plugin: 'conversor', key: 'notice' } as const, null)
+const isPaused = atom({ plugin: 'converter', key: 'isPaused' } as const, false)
+const notice = atom({ plugin: 'converter', key: 'notice' } as const, null)
 
 const baseName = (path: string) =>
   path.slice(Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\')) + 1)
@@ -29,15 +29,15 @@ const baseName = (path: string) =>
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
-      name: 'conversor',
+      name: 'converter',
       description:
-        'Estado del conversor de documentos; "off" lo pausa y "on" lo reactiva',
+        'Document converter status; "off" pauses it and "on" resumes it',
     })
 
     return next(e)
   })
 
-  on('command.run', { command: 'conversor' }, async ($, e) => {
+  on('command.run', { command: 'converter' }, async ($, e) => {
     const word = e.args.trim().toLowerCase()
     if (word === 'off' || word === 'on') {
       await update($, isPaused, () => word === 'off')
@@ -46,9 +46,9 @@ export const register: Register = on => {
 
     return {
       text:
-        `Conversor ${paused ? 'en pausa' : 'activo'}. En esta sesión: ` +
-        `${sum.converted} convertidos, ${sum.reused} reutilizados, ${sum.failed} fallidos. ` +
-        (paused ? '/conversor on lo reactiva.' : '/conversor off lo pausa.'),
+        `Converter ${paused ? 'paused' : 'active'}. This session: ` +
+        `${sum.converted} converted, ${sum.reused} reused, ${sum.failed} failed. ` +
+        (paused ? '/converter on resumes it.' : '/converter off pauses it.'),
     }
   })
 
@@ -86,7 +86,7 @@ export const register: Register = on => {
         await update($, tally, sum => ({ ...sum, failed: sum.failed + 1 }))
         const at = await $.clock.now()
         await update($, notice, () => ({
-          text: `No se pudo convertir ${name}; se leyó el original`,
+          text: `Could not convert ${name}; the original was read`,
           at,
         }))
 
@@ -103,7 +103,7 @@ export const register: Register = on => {
     if (!isFresh) {
       const at = await $.clock.now()
       await update($, notice, () => ({
-        text: `${name} convertido a Markdown`,
+        text: `${name} converted to Markdown`,
         at,
       }))
     }
@@ -117,8 +117,8 @@ export const register: Register = on => {
       ...ran,
       context: [
         ...(ran.context ?? []),
-        `Este resultado es ${target}: la conversión a Markdown de ${e.file_path} hecha con markitdown. ` +
-          'Las imágenes y el diseño del original no están; si hacen falta, /conversor off permite leer el original.',
+        `This result is ${target}: the Markdown conversion of ${e.file_path} made with markitdown. ` +
+          "The original's images and layout are missing; if they are needed, /converter off lets the original be read.",
       ],
     }
   })

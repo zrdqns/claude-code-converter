@@ -5,7 +5,7 @@ export type Notice = { text: string; at: number }
 
 declare module 'claude-code' {
   interface PluginState {
-    conversor: {
+    converter: {
       /** Sources markitdown could not convert, by path, with their mtime then. */
       failures: Record<string, number>
       tally: Tally

@@ -1,58 +1,58 @@
-# conversor
+# converter
 
-Mod para [Claude Code](https://claude.com/claude-code): convierte PDF, Word, Excel y PowerPoint a Markdown con [markitdown](https://github.com/microsoft/markitdown) antes de que Claude los lea.
+A mod for [Claude Code](https://claude.com/claude-code): it converts PDF, Word, Excel and PowerPoint files to Markdown with [markitdown](https://github.com/microsoft/markitdown) before Claude reads them.
 
-Leer el Markdown en lugar del original gasta menos tokens y se entiende mejor.
+Reading the Markdown instead of the original spends fewer tokens and is easier to understand.
 
-## Cómo funciona
+## How it works
 
-- Cuando Claude va a leer un `.pdf`, `.docx`, `.xlsx`, `.xls` o `.pptx`, el mod lo convierte y le entrega el Markdown en su lugar.
-- La conversión se guarda junto al original, como `informe.pdf.md`, y se reutiliza mientras el original no cambie.
-- Si la conversión falla, o no encuentra texto (un PDF escaneado), Claude lee el original. No se reintenta hasta que el archivo cambie.
-- Claude recibe una nota de que está leyendo una conversión, sin las imágenes ni el diseño del original.
+- When Claude is about to read a `.pdf`, `.docx`, `.xlsx`, `.xls` or `.pptx`, the mod converts it and hands over the Markdown in its place.
+- The conversion is saved next to the original, as `report.pdf.md`, and is reused as long as the original does not change.
+- If the conversion fails, or finds no text (a scanned PDF), Claude reads the original. It is not retried until the file changes.
+- Claude gets a note that it is reading a conversion, without the original's images or layout.
 
-## Comandos
+## Commands
 
-| Comando | Qué hace |
+| Command | What it does |
 | --- | --- |
-| `/conversor` | Estado del mod y cuántos documentos convirtió, reutilizó o no pudo convertir en la sesión. |
-| `/conversor off` | Lo pausa: los documentos se leen en su formato original. |
-| `/conversor on` | Lo reactiva. |
+| `/converter` | The mod's status and how many documents it converted, reused or could not convert in the session. |
+| `/converter off` | Pauses it: documents are read in their original format. |
+| `/converter on` | Resumes it. |
 
-## Requisitos
+## Requirements
 
-- Python con el lanzador `py`, el que instala Python en Windows.
-- El paquete `markitdown`:
+- Python with the `py` launcher, the one Python installs on Windows.
+- The `markitdown` package:
 
 ```bash
 py -m pip install "markitdown[all]"
 ```
 
-## Instalación
+## Installation
 
-En el prompt de una sesión de terminal:
+At the prompt of a terminal session:
 
 ```
-/plugin install conversor --marketplace zrdqns/claude-code-conversor
+/plugin install converter --marketplace zrdqns/claude-code-converter
 ```
 
-Responde `y` para añadir el marketplace y elige el alcance (el de usuario lo carga en todas las sesiones, también en las de la app de escritorio).
+Answer `y` to add the marketplace and choose the scope (the user scope loads it in every session, including the desktop app's).
 
-Para probarlo desde una copia local, sin instalarlo:
+To try it from a local copy, without installing it:
 
 ```bash
-claude --plugin-dir ./claude-code-conversor
+claude --plugin-dir ./claude-code-converter
 ```
 
-## Desarrollo
+## Development
 
 ```bash
 claude plugin validate .
 claude plugin test .
 ```
 
-El módulo está en [`hooks/register.ts`](hooks/register.ts), su contrato de estado en [`types/index.d.ts`](types/index.d.ts) y los tests en [`tests/`](tests).
+The module is in [`hooks/register.ts`](hooks/register.ts), its state contract in [`types/index.d.ts`](types/index.d.ts) and the tests in [`tests/`](tests).
 
-## Licencia
+## License
 
 [MIT](LICENSE)

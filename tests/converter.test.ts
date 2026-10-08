@@ -2,7 +2,7 @@ import type { On } from 'claude-code'
 import { expect, mock, test } from 'claude-code/testing'
 import type { Engine } from 'claude-code/testing'
 
-const PDF = 'c:/docs/informe.pdf'
+const PDF = 'c:/docs/report.pdf'
 const MD = `${PDF}.md`
 
 const run = ($: Engine, command: string, args: string) =>
@@ -23,11 +23,11 @@ const file = (mtimeMs: number, size = 5000) => ({
 const READER = {
   plugins: [
     {
-      name: 'lector',
+      name: 'reader',
       register(on: On) {
-        on('command.run', { command: 'aviso' }, async $ => {
+        on('command.run', { command: 'notice' }, async $ => {
           const held = await $.state.get({
-            plugin: 'conversor',
+            plugin: 'converter',
             key: 'notice',
           } as never)
 
@@ -39,7 +39,7 @@ const READER = {
 }
 
 /** What the mod last left for a pane to show. */
-const said = async ($: Engine) => (await run($, 'aviso', '')).text
+const said = async ($: Engine) => (await run($, 'notice', '')).text
 
 /** A disk in memory: the stat of each path there, and the commands run. */
 const world = (on: On, disk: Record<string, ReturnType<typeof file>>) => {
@@ -63,7 +63,7 @@ const world = (on: On, disk: Record<string, ReturnType<typeof file>>) => {
   on('tool.call', { tool: 'Read' }, (_, e) => {
     reads.push(norm(e.file_path))
 
-    return { result: 'contenido' } as never
+    return { result: 'content' } as never
   })
 
   return {
@@ -78,7 +78,7 @@ const world = (on: On, disk: Record<string, ReturnType<typeof file>>) => {
   }
 }
 
-test('convierte un PDF y lee el Markdown en su lugar', READER, async ($, on) => {
+test('converts a PDF and reads the Markdown in its place', READER, async ($, on) => {
   const w = world(on, { [PDF]: file(10) })
 
   const ran = await $.tool.call({ tool: 'Read', file_path: PDF, pages: '1-3' })
@@ -90,10 +90,10 @@ test('convierte un PDF y lee el Markdown en su lugar', READER, async ($, on) => 
   expect(w.reads).toEqual([MD])
   expect(ran.deny).toBeUndefined()
   expect(ran.context?.[0]).toMatch(/markitdown/)
-  expect(await said($)).toBe('informe.pdf convertido a Markdown')
+  expect(await said($)).toBe('report.pdf converted to Markdown')
 })
 
-test('reutiliza una conversión vigente y rehace una vieja', async ($, on) => {
+test('reuses a fresh conversion and redoes a stale one', async ($, on) => {
   const disk = { [PDF]: file(10), [MD]: file(15) }
   const w = world(on, disk)
 
@@ -107,7 +107,7 @@ test('reutiliza una conversión vigente y rehace una vieja', async ($, on) => {
   expect(w.runs).toHaveLength(1)
 })
 
-test('si la conversión falla lee el original y no reintenta', READER, async ($, on) => {
+test('when the conversion fails it reads the original and does not retry', READER, async ($, on) => {
   const w = world(on, { [PDF]: file(10) })
   w.fail()
 
@@ -116,10 +116,10 @@ test('si la conversión falla lee el original y no reintenta', READER, async ($,
 
   expect(w.runs).toHaveLength(1)
   expect(w.reads).toEqual([PDF, PDF])
-  expect(await said($)).toMatch(/No se pudo convertir informe.pdf/)
+  expect(await said($)).toMatch(/Could not convert report.pdf/)
 })
 
-test('una conversión vacía (PDF escaneado) deja leer el original', async ($, on) => {
+test('an empty conversion (a scanned PDF) leaves the original to be read', async ($, on) => {
   const w = world(on, { [PDF]: file(10) })
   w.makes(file(20, 3))
 
@@ -128,11 +128,11 @@ test('una conversión vacía (PDF escaneado) deja leer el original', async ($, o
   expect(w.reads).toEqual([PDF])
 })
 
-test('no toca otros archivos ni actúa en pausa', async ($, on) => {
+test('does not touch other files or act while paused', async ($, on) => {
   const w = world(on, { [PDF]: file(10), 'c:/src/a.ts': file(10) })
 
   await $.tool.call({ tool: 'Read', file_path: 'c:/src/a.ts' })
-  await run($, 'conversor', 'off')
+  await run($, 'converter', 'off')
   await $.tool.call({ tool: 'Read', file_path: PDF })
 
   expect(w.runs).toHaveLength(0)
