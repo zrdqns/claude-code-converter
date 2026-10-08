@@ -1,0 +1,6 @@
+{
+  "name": "claude-code-conversor",
+  "description": "Convierte PDF, Word, Excel y PowerPoint a Markdown con markitdown antes de que Claude Code los lea",
+  "owner": { "name": "zrdqns" },
+  "plugins": [{ "name": "conversor", "source": "./" }]
+}

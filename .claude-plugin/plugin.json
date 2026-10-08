@@ -1,0 +1,7 @@
+{
+  "name": "conversor",
+  "version": "0.1.0",
+  "description": "Convierte PDF, Word, Excel y PowerPoint a Markdown con markitdown antes de leerlos",
+  "author": { "name": "Daniel" },
+  "types": "./types/index.d.ts"
+}
